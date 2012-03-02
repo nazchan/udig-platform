@@ -96,6 +96,9 @@ public class Messages extends NLS {
     public static String Delete_deleteElement;
     public static String Delete_deleteMultipleElements;
 	public static String Delete_deleteProject;
+	public static String Delete_deleteFolder;
+	public static String Delete_deleteMultipleFolders;
+	public static String Delete_deleteMultipleFolderLayers;
 	public static String IssuesView_showGroups;
 	public static String IssuesView_DeleteIssueTooltip;
 	public static String IssuesView_DeleteIssueAction;

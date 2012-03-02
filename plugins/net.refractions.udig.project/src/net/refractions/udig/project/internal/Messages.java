@@ -118,6 +118,7 @@ public class Messages extends NLS {
     public static String DeleteLayerItemCommand_Name;
     public static String DeleteLayerItemsCommand_Name;
     public static String DeleteFolderItemCommand_Name;
+    public static String DeleteLegendItemsCommand_Name;
 	public static String DeleteFeatureCommand_deleteFeature;
 	public static String RenderExecutorImpl_1;
 	public static String RenderExecutorImpl_2;
@@ -143,3 +144,4 @@ public class Messages extends NLS {
 	private Messages() {
 	}
 }
+
