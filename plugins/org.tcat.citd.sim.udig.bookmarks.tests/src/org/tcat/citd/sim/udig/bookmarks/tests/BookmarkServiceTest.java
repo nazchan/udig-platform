@@ -32,6 +32,7 @@ public class BookmarkServiceTest {
     
     @Test
     public void testAddBookmark() {
+        
         Collection<IBookmark> bookmarks = service.getBookmarks();
         assertTrue(bookmarks.isEmpty());
         
