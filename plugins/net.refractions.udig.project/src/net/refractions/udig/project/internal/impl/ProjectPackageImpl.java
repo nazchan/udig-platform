@@ -18,6 +18,7 @@ import net.refractions.udig.project.IBlackboard;
 import net.refractions.udig.project.IEditManager;
 import net.refractions.udig.project.IFolder;
 import net.refractions.udig.project.ILayer;
+import net.refractions.udig.project.ILayerLegendItem;
 import net.refractions.udig.project.ILegendItem;
 import net.refractions.udig.project.IMap;
 import net.refractions.udig.project.IProject;
@@ -41,6 +42,7 @@ import net.refractions.udig.project.internal.EditManager;
 import net.refractions.udig.project.internal.Folder;
 import net.refractions.udig.project.internal.Layer;
 import net.refractions.udig.project.internal.LayerFactory;
+import net.refractions.udig.project.internal.LayerLegendItem;
 import net.refractions.udig.project.internal.LegendItem;
 import net.refractions.udig.project.internal.Map;
 import net.refractions.udig.project.internal.Project;
@@ -279,6 +281,13 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- end-user-doc -->
      * @generated
      */
+    private EClass iLayerLegendItemEClass = null;
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
     private EClass legendItemEClass = null;
 
     /**
@@ -287,6 +296,13 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * @generated
      */
     private EClass iLegendItemEClass = null;
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    private EClass layerLegendItemEClass = null;
 
     /**
      * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -782,7 +798,7 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- begin-user-doc --> <!-- end-user-doc -->
      * @generated
      */
-    public EAttribute getLayer_CatalogRef() {
+    public EAttribute getLayer_Name() {
         return (EAttribute) layerEClass.getEStructuralFeatures().get(5);
     }
 
@@ -790,7 +806,7 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- begin-user-doc --> <!-- end-user-doc -->
      * @generated
      */
-    public EAttribute getLayer_ID() {
+    public EAttribute getLayer_CatalogRef() {
         return (EAttribute) layerEClass.getEStructuralFeatures().get(6);
     }
 
@@ -798,7 +814,7 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- begin-user-doc --> <!-- end-user-doc -->
      * @generated
      */
-    public EAttribute getLayer_Visible() {
+    public EAttribute getLayer_ID() {
         return (EAttribute) layerEClass.getEStructuralFeatures().get(7);
     }
 
@@ -806,7 +822,7 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- begin-user-doc --> <!-- end-user-doc -->
      * @generated
      */
-    public EAttribute getLayer_GeoResource() {
+    public EAttribute getLayer_Visible() {
         return (EAttribute) layerEClass.getEStructuralFeatures().get(8);
     }
 
@@ -814,7 +830,7 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- begin-user-doc --> <!-- end-user-doc -->
      * @generated
      */
-    public EAttribute getLayer_GeoResources() {
+    public EAttribute getLayer_GeoResource() {
         return (EAttribute) layerEClass.getEStructuralFeatures().get(9);
     }
 
@@ -822,7 +838,7 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- begin-user-doc --> <!-- end-user-doc -->
      * @generated
      */
-    public EAttribute getLayer_CRS() {
+    public EAttribute getLayer_GeoResources() {
         return (EAttribute) layerEClass.getEStructuralFeatures().get(10);
     }
 
@@ -830,8 +846,16 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- begin-user-doc --> <!-- end-user-doc -->
      * @generated
      */
+    public EAttribute getLayer_CRS() {
+        return (EAttribute) layerEClass.getEStructuralFeatures().get(11);
+    }
+
+    /**
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     * @generated
+     */
     public EReference getLayer_Properties() {
-        return (EReference) layerEClass.getEStructuralFeatures().get(11);
+        return (EReference) layerEClass.getEStructuralFeatures().get(12);
     }
 
     /**
@@ -839,14 +863,6 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * @generated
      */
     public EAttribute getLayer_ColourScheme() {
-        return (EAttribute) layerEClass.getEStructuralFeatures().get(12);
-    }
-
-    /**
-     * <!-- begin-user-doc --> <!-- end-user-doc -->
-     * @generated
-     */
-    public EAttribute getLayer_DefaultColor() {
         return (EAttribute) layerEClass.getEStructuralFeatures().get(13);
     }
 
@@ -854,16 +870,15 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- begin-user-doc --> <!-- end-user-doc -->
      * @generated
      */
-    public EAttribute getLayer_FeatureChanges() {
+    public EAttribute getLayer_DefaultColor() {
         return (EAttribute) layerEClass.getEStructuralFeatures().get(14);
     }
 
     /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
      * @generated
      */
-    public EAttribute getLayer_MinScaleDenominator() {
+    public EAttribute getLayer_FeatureChanges() {
         return (EAttribute) layerEClass.getEStructuralFeatures().get(15);
     }
 
@@ -872,7 +887,7 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- end-user-doc -->
      * @generated
      */
-    public EAttribute getLayer_MaxScaleDenominator() {
+    public EAttribute getLayer_MinScaleDenominator() {
         return (EAttribute) layerEClass.getEStructuralFeatures().get(16);
     }
 
@@ -881,8 +896,8 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- end-user-doc -->
      * @generated
      */
-    public EReference getLayer_InteractionMap() {
-        return (EReference) layerEClass.getEStructuralFeatures().get(17);
+    public EAttribute getLayer_MaxScaleDenominator() {
+        return (EAttribute) layerEClass.getEStructuralFeatures().get(17);
     }
 
     /**
@@ -890,8 +905,26 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- end-user-doc -->
      * @generated
      */
-    public EReference getLayer_Map() {
+    public EReference getLayer_InteractionMap() {
         return (EReference) layerEClass.getEStructuralFeatures().get(18);
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EAttribute getLayer_Shown() {
+        return (EAttribute) layerEClass.getEStructuralFeatures().get(19);
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EAttribute getLayer_Icon() {
+        return (EAttribute) layerEClass.getEStructuralFeatures().get(20);
     }
 
     /**
@@ -997,15 +1030,6 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      */
     public EReference getMap_Legend() {
         return (EReference) mapEClass.getEStructuralFeatures().get(11);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    public EReference getMap_Layers() {
-        return (EReference) mapEClass.getEStructuralFeatures().get(12);
     }
 
     /**
@@ -1205,7 +1229,7 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * @generated
      */
     public EAttribute getBlackboardEntry_Key() {
-        return (EAttribute) blackboardEntryEClass.getEStructuralFeatures().get(1);
+        return (EAttribute) blackboardEntryEClass.getEStructuralFeatures().get(0);
     }
 
     /**
@@ -1213,7 +1237,7 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * @generated
      */
     public EAttribute getBlackboardEntry_Memento() {
-        return (EAttribute) blackboardEntryEClass.getEStructuralFeatures().get(0);
+        return (EAttribute) blackboardEntryEClass.getEStructuralFeatures().get(1);
     }
 
     /**
@@ -1310,6 +1334,15 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- end-user-doc -->
      * @generated
      */
+    public EClass getILayerLegendItem() {
+        return iLayerLegendItemEClass;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
     public EClass getLegendItem() {
         return legendItemEClass;
     }
@@ -1320,15 +1353,6 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * @generated
      */
     public EAttribute getLegendItem_Name() {
-        return (EAttribute) legendItemEClass.getEStructuralFeatures().get(2);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    public EAttribute getLegendItem_Shown() {
         return (EAttribute) legendItemEClass.getEStructuralFeatures().get(0);
     }
 
@@ -1337,8 +1361,17 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * <!-- end-user-doc -->
      * @generated
      */
-    public EAttribute getLegendItem_Icon() {
+    public EAttribute getLegendItem_Shown() {
         return (EAttribute) legendItemEClass.getEStructuralFeatures().get(1);
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EAttribute getLegendItem_Icon() {
+        return (EAttribute) legendItemEClass.getEStructuralFeatures().get(2);
     }
 
     /**
@@ -1348,6 +1381,24 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      */
     public EClass getILegendItem() {
         return iLegendItemEClass;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EClass getLayerLegendItem() {
+        return layerLegendItemEClass;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public EReference getLayerLegendItem_Layer() {
+        return (EReference) layerLegendItemEClass.getEStructuralFeatures().get(0);
     }
 
     /**
@@ -1641,8 +1692,7 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      * @generated
      */
     public void createPackageContents() {
-        if (isCreated)
-            return;
+        if (isCreated) return;
         isCreated = true;
 
         // Create classes and their features
@@ -1684,6 +1734,7 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
         createEReference(layerEClass, LAYER__STYLE_BLACKBOARD);
         createEAttribute(layerEClass, LAYER__ZORDER);
         createEAttribute(layerEClass, LAYER__STATUS);
+        createEAttribute(layerEClass, LAYER__NAME);
         createEAttribute(layerEClass, LAYER__CATALOG_REF);
         createEAttribute(layerEClass, LAYER__ID);
         createEAttribute(layerEClass, LAYER__VISIBLE);
@@ -1697,7 +1748,8 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
         createEAttribute(layerEClass, LAYER__MIN_SCALE_DENOMINATOR);
         createEAttribute(layerEClass, LAYER__MAX_SCALE_DENOMINATOR);
         createEReference(layerEClass, LAYER__INTERACTION_MAP);
-        createEReference(layerEClass, LAYER__MAP);
+        createEAttribute(layerEClass, LAYER__SHOWN);
+        createEAttribute(layerEClass, LAYER__ICON);
 
         mapEClass = createEClass(MAP);
         createEReference(mapEClass, MAP__CONTEXT_MODEL);
@@ -1712,7 +1764,6 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
         createEAttribute(mapEClass, MAP__COLOUR_SCHEME);
         createEReference(mapEClass, MAP__BLACK_BOARD_INTERNAL);
         createEReference(mapEClass, MAP__LEGEND);
-        createEReference(mapEClass, MAP__LAYERS);
 
         projectEClass = createEClass(PROJECT);
         createEAttribute(projectEClass, PROJECT__NAME);
@@ -1748,8 +1799,8 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
         createEReference(blackboardEClass, BLACKBOARD__ENTRIES);
 
         blackboardEntryEClass = createEClass(BLACKBOARD_ENTRY);
-        createEAttribute(blackboardEntryEClass, BLACKBOARD_ENTRY__MEMENTO);
         createEAttribute(blackboardEntryEClass, BLACKBOARD_ENTRY__KEY);
+        createEAttribute(blackboardEntryEClass, BLACKBOARD_ENTRY__MEMENTO);
         createEAttribute(blackboardEntryEClass, BLACKBOARD_ENTRY__OBJECT_CLASS);
         createEAttribute(blackboardEntryEClass, BLACKBOARD_ENTRY__OBJECT);
 
@@ -1768,12 +1819,17 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
         folderEClass = createEClass(FOLDER);
         createEReference(folderEClass, FOLDER__ITEMS);
 
+        iLayerLegendItemEClass = createEClass(ILAYER_LEGEND_ITEM);
+
         legendItemEClass = createEClass(LEGEND_ITEM);
+        createEAttribute(legendItemEClass, LEGEND_ITEM__NAME);
         createEAttribute(legendItemEClass, LEGEND_ITEM__SHOWN);
         createEAttribute(legendItemEClass, LEGEND_ITEM__ICON);
-        createEAttribute(legendItemEClass, LEGEND_ITEM__NAME);
 
         iLegendItemEClass = createEClass(ILEGEND_ITEM);
+
+        layerLegendItemEClass = createEClass(LAYER_LEGEND_ITEM);
+        createEReference(layerLegendItemEClass, LAYER_LEGEND_ITEM__LAYER);
 
         // Create data types
         coordinateEDataType = createEDataType(COORDINATE);
@@ -1825,8 +1881,7 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
      */
     @SuppressWarnings("unchecked")
     public void initializePackageContents() {
-        if (isInitialized)
-            return;
+        if (isInitialized) return;
         isInitialized = true;
 
         // Initialize package
@@ -1850,7 +1905,6 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
         layerEClass.getESuperTypes().add(this.getIAdaptable());
         layerEClass.getESuperTypes().add(this.getIBlockingAdaptable());
         layerEClass.getESuperTypes().add(this.getIResolveChangeListener());
-        layerEClass.getESuperTypes().add(this.getLegendItem());
         mapEClass.getESuperTypes().add(this.getProjectElement());
         mapEClass.getESuperTypes().add(this.getIMap());
         projectEClass.getESuperTypes().add(this.getIProject());
@@ -1862,6 +1916,8 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
         folderEClass.getESuperTypes().add(this.getIFolder());
         folderEClass.getESuperTypes().add(this.getLegendItem());
         legendItemEClass.getESuperTypes().add(this.getILegendItem());
+        layerLegendItemEClass.getESuperTypes().add(this.getLegendItem());
+        layerLegendItemEClass.getESuperTypes().add(this.getILayerLegendItem());
 
         // Initialize classes and features; add operations and parameters
         initEClass(comparableEClass, Object.class,
@@ -1978,6 +2034,10 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
                 ecorePackage.getEInt(),
                 "status", "0", 0, 1, Layer.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$ //$NON-NLS-2$
         initEAttribute(
+                getLayer_Name(),
+                ecorePackage.getEString(),
+                "name", null, 0, 1, Layer.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+        initEAttribute(
                 getLayer_CatalogRef(),
                 this.getCatalogRef(),
                 "catalogRef", null, 0, 1, Layer.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
@@ -2031,11 +2091,14 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
                 this.getInteractionToEBooleanObjectMapEntry(),
                 null,
                 "interactionMap", null, 0, -1, Layer.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-        initEReference(
-                getLayer_Map(),
-                this.getMap(),
-                this.getMap_Layers(),
-                "map", null, 0, 1, Layer.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+        initEAttribute(
+                getLayer_Shown(),
+                ecorePackage.getEBoolean(),
+                "shown", null, 0, 1, Layer.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+        initEAttribute(
+                getLayer_Icon(),
+                this.getImageDescriptor(),
+                "icon", null, 0, 1, Layer.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
         op = addEOperation(layerEClass, this.getQuery(), "getQuery", 0, 1, IS_UNIQUE, IS_ORDERED); //$NON-NLS-1$
         addEParameter(op, ecorePackage.getEBoolean(), "selection", 0, 1, IS_UNIQUE, IS_ORDERED); //$NON-NLS-1$
@@ -2098,14 +2161,9 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
                 "blackBoardInternal", null, 0, 1, Map.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
         initEReference(
                 getMap_Legend(),
-                this.getLegendItem(),
+                this.getILegendItem(),
                 null,
                 "legend", null, 0, -1, Map.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-        initEReference(
-                getMap_Layers(),
-                this.getLayer(),
-                this.getLayer_Map(),
-                "layers", null, 0, -1, Map.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
         op = addEOperation(mapEClass, this.getReferencedEnvelope(),
                 "getBounds", 0, 1, IS_UNIQUE, IS_ORDERED); //$NON-NLS-1$
@@ -2254,13 +2312,13 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
         initEClass(blackboardEntryEClass, BlackboardEntry.class,
                 "BlackboardEntry", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
         initEAttribute(
-                getBlackboardEntry_Memento(),
-                ecorePackage.getEString(),
-                "memento", null, 0, 1, BlackboardEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-        initEAttribute(
                 getBlackboardEntry_Key(),
                 ecorePackage.getEString(),
                 "key", null, 0, 1, BlackboardEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+        initEAttribute(
+                getBlackboardEntry_Memento(),
+                ecorePackage.getEString(),
+                "memento", null, 0, 1, BlackboardEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
         initEAttribute(
                 getBlackboardEntry_ObjectClass(),
                 ecorePackage.getEJavaClass(),
@@ -2296,12 +2354,19 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
                 "Folder", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
         initEReference(
                 getFolder_Items(),
-                this.getLegendItem(),
+                this.getILegendItem(),
                 null,
                 "items", null, 0, -1, Folder.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
+        initEClass(iLayerLegendItemEClass, ILayerLegendItem.class,
+                "ILayerLegendItem", IS_ABSTRACT, IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+
         initEClass(legendItemEClass, LegendItem.class,
                 "LegendItem", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+        initEAttribute(
+                getLegendItem_Name(),
+                ecorePackage.getEString(),
+                "name", null, 0, 1, LegendItem.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
         initEAttribute(
                 getLegendItem_Shown(),
                 ecorePackage.getEBoolean(),
@@ -2310,13 +2375,17 @@ public class ProjectPackageImpl extends EPackageImpl implements ProjectPackage {
                 getLegendItem_Icon(),
                 this.getImageDescriptor(),
                 "icon", null, 0, 1, LegendItem.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-        initEAttribute(
-                getLegendItem_Name(),
-                ecorePackage.getEString(),
-                "name", null, 0, 1, LegendItem.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
         initEClass(iLegendItemEClass, ILegendItem.class,
                 "ILegendItem", IS_ABSTRACT, IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+
+        initEClass(layerLegendItemEClass, LayerLegendItem.class,
+                "LayerLegendItem", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+        initEReference(
+                getLayerLegendItem_Layer(),
+                this.getLayer(),
+                null,
+                "layer", null, 1, 1, LayerLegendItem.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
         // Initialize data types
         initEDataType(coordinateEDataType, Coordinate.class,

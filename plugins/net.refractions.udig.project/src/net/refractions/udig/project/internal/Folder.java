@@ -43,7 +43,7 @@ public interface Folder extends IFolder, LegendItem {
 
     /**
      * Returns the value of the '<em><b>Items</b></em>' containment reference list.
-     * The list contents are of type {@link net.refractions.udig.project.internal.LegendItem}.
+     * The list contents are of type {@link net.refractions.udig.project.ILegendItem}.
      * <!-- begin-user-doc -->
      * <p>
      * If the meaning of the '<em>Items</em>' containment reference list isn't clear,
@@ -52,8 +52,8 @@ public interface Folder extends IFolder, LegendItem {
      * <!-- end-user-doc -->
      * @return the value of the '<em>Items</em>' containment reference list.
      * @see net.refractions.udig.project.internal.ProjectPackage#getFolder_Items()
-     * @model containment="true"
+     * @model type="net.refractions.udig.project.internal.ILegendItem" containment="true"
      * @generated
      */
-    List<LegendItem> getItems();
+    List<ILegendItem> getItems();
 } // Folder

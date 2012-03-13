@@ -33,6 +33,7 @@ import net.refractions.udig.project.internal.EditManager;
 import net.refractions.udig.project.internal.Folder;
 import net.refractions.udig.project.internal.Layer;
 import net.refractions.udig.project.internal.LayerFactory;
+import net.refractions.udig.project.internal.LayerLegendItem;
 import net.refractions.udig.project.internal.LegendItem;
 import net.refractions.udig.project.internal.Map;
 import net.refractions.udig.project.internal.Project;
@@ -152,6 +153,8 @@ public class ProjectFactoryImpl extends EFactoryImpl implements ProjectFactory {
             return createFolder();
         case ProjectPackage.LEGEND_ITEM:
             return createLegendItem();
+        case ProjectPackage.LAYER_LEGEND_ITEM:
+            return createLayerLegendItem();
         default:
             throw new IllegalArgumentException(
                     "The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -425,6 +428,16 @@ public class ProjectFactoryImpl extends EFactoryImpl implements ProjectFactory {
     public LegendItem createLegendItem() {
         LegendItemImpl legendItem = new LegendItemImpl();
         return legendItem;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    public LayerLegendItem createLayerLegendItem() {
+        LayerLegendItemImpl layerLegendItem = new LayerLegendItemImpl();
+        return layerLegendItem;
     }
 
     /**
@@ -892,8 +905,7 @@ public class ProjectFactoryImpl extends EFactoryImpl implements ProjectFactory {
         value = value + numColours + ";"; //$NON-NLS-1$
         HashMap colourMap = instance.getColourMap();
         for( int i = 0; i < numItems; i++ ) {
-            if (i > 0)
-                value = value + ","; //$NON-NLS-1$
+            if (i > 0) value = value + ","; //$NON-NLS-1$
             value = value + colourMap.get(i);
         }
         value = value + ";"; //$NON-NLS-1$
@@ -1000,8 +1012,7 @@ public class ProjectFactoryImpl extends EFactoryImpl implements ProjectFactory {
      */
     public String convertReferencedEnvelopeToString( EDataType eDataType, Object instanceValue ) {
         Envelope env = (Envelope) instanceValue;
-        if (env.isNull())
-            return ""; //$NON-NLS-1$
+        if (env.isNull()) return ""; //$NON-NLS-1$
 
         String envString = env.getMinX()
                 + "," + env.getMaxX() + "," + env.getMinY() + "," + env.getMaxY(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

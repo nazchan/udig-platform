@@ -72,9 +72,9 @@ public class FolderItemProvider extends ItemProviderAdapter
         if (itemPropertyDescriptors == null) {
             super.getPropertyDescriptors(object);
 
+            addNamePropertyDescriptor(object);
             addShownPropertyDescriptor(object);
             addIconPropertyDescriptor(object);
-            addNamePropertyDescriptor(object);
         }
         return itemPropertyDescriptors;
     }
@@ -185,16 +185,16 @@ public class FolderItemProvider extends ItemProviderAdapter
     }
 
     /**
-     * This returns the label text for the adapted class. If the name attribute of the object is
-     * null or with length 0, return the object type as string, else return the name attribute.
-     * 
-     * @generated not 
+     * This returns the label text for the adapted class.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
      */
     @Override
     public String getText( Object object ) {
         String label = ((Folder) object).getName();
         return label == null || label.length() == 0 ? getString("_UI_Folder_type") : //$NON-NLS-1$
-                label;
+                getString("_UI_Folder_type") + " " + label; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /**
@@ -209,9 +209,9 @@ public class FolderItemProvider extends ItemProviderAdapter
         updateChildren(notification);
 
         switch( notification.getFeatureID(Folder.class) ) {
+        case ProjectPackage.FOLDER__NAME:
         case ProjectPackage.FOLDER__SHOWN:
         case ProjectPackage.FOLDER__ICON:
-        case ProjectPackage.FOLDER__NAME:
             fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(),
                     false, true));
             return;
