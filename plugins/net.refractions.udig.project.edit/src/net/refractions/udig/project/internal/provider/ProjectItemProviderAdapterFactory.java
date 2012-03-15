@@ -117,7 +117,9 @@ public class ProjectItemProviderAdapterFactory extends ProjectAdapterFactory
      */
     @Override
     public Adapter createMapAdapter() {
-        return new MapItemProvider(this);
+        //return new MapItemProvider(this);
+        return new LazyMapLayerItemProvider(this);
+        //return new LazyMapLegendItemProvider(this);
     }
 
     /**

@@ -45,6 +45,9 @@ public class LayerLegendItemItemProvider extends LegendItemItemProvider
             ITreeItemContentProvider,
             IItemLabelProvider,
             IItemPropertySource {
+    
+    private LayerItemProvider delegate;
+    
     /**
      * This constructs an instance from a factory and a notifier.
      * <!-- begin-user-doc -->
@@ -53,6 +56,7 @@ public class LayerLegendItemItemProvider extends LegendItemItemProvider
      */
     public LayerLegendItemItemProvider( AdapterFactory adapterFactory ) {
         super(adapterFactory);
+        this.delegate = new LayerItemProvider(adapterFactory);
     }
 
     /**
@@ -92,12 +96,16 @@ public class LayerLegendItemItemProvider extends LegendItemItemProvider
     /**
      * This returns LayerLegendItem.gif.
      * <!-- begin-user-doc -->
+     * Delegates getting the image to the LayerItemProvider, in reference to its layer attribute. 
      * <!-- end-user-doc -->
-     * @generated
+     * @generated NOT
      */
     @Override
     public Object getImage( Object object ) {
+        /* Auto-generated code
         return overlayImage(object, getResourceLocator().getImage("full/obj16/LayerLegendItem")); //$NON-NLS-1$
+         */
+        return this.delegate.getImage(((LayerLegendItem) object).getLayer());
     }
 
     /**
@@ -113,14 +121,18 @@ public class LayerLegendItemItemProvider extends LegendItemItemProvider
     /**
      * This returns the label text for the adapted class.
      * <!-- begin-user-doc -->
+     * Delegates getting the label to the LayerItemProvider, in reference to its layer attribute.
      * <!-- end-user-doc -->
-     * @generated
+     * @generated NOT
      */
     @Override
     public String getText( Object object ) {
+        /* Auto-generated code
         String label = ((LayerLegendItem) object).getName();
         return label == null || label.length() == 0 ? getString("_UI_LayerLegendItem_type") : //$NON-NLS-1$
                 getString("_UI_LayerLegendItem_type") + " " + label; //$NON-NLS-1$ //$NON-NLS-2$
+        */
+        return this.delegate.getText(((LayerLegendItem) object).getLayer());
     }
 
     /**

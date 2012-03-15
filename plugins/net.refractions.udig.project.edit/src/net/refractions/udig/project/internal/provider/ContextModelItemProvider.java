@@ -143,8 +143,8 @@ public class ContextModelItemProvider extends ItemProviderAdapter
                 ContextModel model = (ContextModel) notifier;
                 EList adapters = model.getMap().eAdapters();
                 for( Object object : adapters ) {
-                    if (object instanceof MapItemProvider) {
-                        MapItemProvider mapItemProvider = ((MapItemProvider) object);
+                    if (object instanceof LazyMapLayerItemProvider) {
+                        LazyMapLayerItemProvider mapItemProvider = ((LazyMapLayerItemProvider) object);
                         //                        mapItemProvider.updateChildList(notification);
                         mapItemProvider.getChildFetcher().notifyChanged();
                         break;
