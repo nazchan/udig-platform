@@ -38,10 +38,8 @@ import net.refractions.udig.project.internal.ProjectFactory;
 import net.refractions.udig.project.internal.ProjectPackage;
 import net.refractions.udig.project.internal.ProjectPlugin;
 import net.refractions.udig.project.internal.commands.AddFolderItemCommand;
-import net.refractions.udig.project.internal.provider.LazyMapLegendItemProvider;
-import net.refractions.udig.project.internal.provider.MapItemProvider;
+import net.refractions.udig.project.internal.provider.MapItemLazyLegendProvider;
 import net.refractions.udig.project.internal.provider.ProjectItemProviderAdapterFactory;
-import net.refractions.udig.project.render.IViewportModel;
 import net.refractions.udig.project.render.IViewportModelListener;
 import net.refractions.udig.project.render.ViewportModelEvent;
 import net.refractions.udig.project.ui.AdapterFactoryLabelProviderDecorator;
@@ -241,7 +239,7 @@ public class LegendView extends ViewPart implements IDropTargetProvider, ISelect
         //Set content provider settings
         ProjectItemProviderAdapterFactory factory = new ProjectItemProviderAdapterFactory(){
             public Adapter createMapAdapter() {
-                return new LazyMapLegendItemProvider( this );
+                return new MapItemLazyLegendProvider( this );
             };
         };
         contentProvider = new AdapterFactoryContentProvider( factory );
