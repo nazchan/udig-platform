@@ -50,7 +50,7 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
  * @author nchan
  * @since 1.2.0
  */
-public class LazyMapLayerItemProvider extends AbstractLazyLoadingItemProvider
+public class MapItemLazyLayerProvider extends AbstractLazyLoadingItemProvider
         implements
             IEditingDomainItemProvider,
             IStructuredItemContentProvider,
@@ -60,12 +60,12 @@ public class LazyMapLayerItemProvider extends AbstractLazyLoadingItemProvider
 
     protected MapItemProvider delegate;
     
-    public LazyMapLayerItemProvider( AdapterFactory adapterFactory ) {
+    public MapItemLazyLayerProvider( AdapterFactory adapterFactory ) {
         super(adapterFactory);
         this.delegate = new MapItemProvider(adapterFactory);
     }
     
-    public LazyMapLayerItemProvider( AdapterFactory adapterFactory, MapItemProvider mapItemProvider ) {
+    public MapItemLazyLayerProvider( AdapterFactory adapterFactory, MapItemProvider mapItemProvider ) {
         super(adapterFactory);
         this.delegate = mapItemProvider;
     }
@@ -149,7 +149,7 @@ public class LazyMapLayerItemProvider extends AbstractLazyLoadingItemProvider
         return new ChildFetcher(this){
             
             protected void notifyChanged() {
-                LazyMapLayerItemProvider.this.notifyChanged(new ENotificationImpl(
+                MapItemLazyLayerProvider.this.notifyChanged(new ENotificationImpl(
                         (InternalEObject) parent, Notification.SET, ProjectPackage.MAP__CONTEXT_MODEL,
                         LayerLoadingPlaceHolder.LOADING_LAYER, null));
             }

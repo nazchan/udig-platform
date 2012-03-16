@@ -50,7 +50,7 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
  * @author nchan
  * @since 1.2.0
  */
-public class LazyMapLegendItemProvider extends AbstractLazyLoadingItemProvider
+public class MapItemLazyLegendProvider extends AbstractLazyLoadingItemProvider
         implements
             IEditingDomainItemProvider,
             IStructuredItemContentProvider,
@@ -60,12 +60,12 @@ public class LazyMapLegendItemProvider extends AbstractLazyLoadingItemProvider
 
     protected MapItemProvider delegate;
     
-    public LazyMapLegendItemProvider( AdapterFactory adapterFactory ) {
+    public MapItemLazyLegendProvider( AdapterFactory adapterFactory ) {
         super(adapterFactory);
         this.delegate = new MapItemProvider(adapterFactory);
     }
     
-    public LazyMapLegendItemProvider( AdapterFactory adapterFactory, MapItemProvider mapItemProvider ) {
+    public MapItemLazyLegendProvider( AdapterFactory adapterFactory, MapItemProvider mapItemProvider ) {
         super(adapterFactory);
         this.delegate = mapItemProvider;
     }
@@ -147,7 +147,7 @@ public class LazyMapLegendItemProvider extends AbstractLazyLoadingItemProvider
     protected ChildFetcher createChildFetcher() {
         return new ChildFetcher(this){
             protected void notifyChanged() {
-                LazyMapLegendItemProvider.this.notifyChanged(new ENotificationImpl(
+                MapItemLazyLegendProvider.this.notifyChanged(new ENotificationImpl(
                         (InternalEObject) parent, Notification.SET, ProjectPackage.MAP__LEGEND,
                         LayerLoadingPlaceHolder.LOADING_LAYER, null));
             }         
