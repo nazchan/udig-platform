@@ -15,6 +15,7 @@
 package net.refractions.udig.project.internal.provider;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import net.refractions.udig.project.internal.Map;
@@ -38,12 +39,12 @@ public class MapItemNoProvider extends MapItemProvider {
     public MapItemNoProvider( AdapterFactory adapterFactory ) {
         super(adapterFactory);
     }
-
+    
     @Override
     public Collection< ? extends EStructuralFeature> getChildrenFeatures( Object object ) {
         if (childrenFeatures == null) {
-            super.getChildrenFeatures(object);
-            // Adds no children features
+            // Initialises list but adds no children features
+            childrenFeatures = new ArrayList<EStructuralFeature>();
         }
         return childrenFeatures;
     }
