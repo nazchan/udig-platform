@@ -149,14 +149,14 @@ public class LazyMapLegendItemProvider extends AbstractLazyLoadingItemProvider
             protected void notifyChanged() {
                 LazyMapLegendItemProvider.this.notifyChanged(new ENotificationImpl(
                         (InternalEObject) parent, Notification.SET, ProjectPackage.MAP__LEGEND,
-                        MapItemProviderOld.LOADING_LAYER, null));
+                        LayerLoadingPlaceHolder.LOADING_LAYER, null));
             }         
         };
     }
 
     @Override
     protected LoadingPlaceHolder getLoadingItem() {
-        return MapItemProviderOld.LOADING_LAYER;
+        return LayerLoadingPlaceHolder.LOADING_LAYER;
     }
     
     @Override

@@ -12,8 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.refractions.udig.project.edit.internal.Messages;
-import net.refractions.udig.project.internal.Layer;
-import net.refractions.udig.project.internal.LayerDecorator;
 import net.refractions.udig.project.internal.Map;
 import net.refractions.udig.project.internal.ProjectFactory;
 import net.refractions.udig.project.internal.ProjectPackage;
@@ -44,7 +42,6 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
 /**
@@ -58,33 +55,6 @@ public class LazyMapLayerProvider extends AbstractLazyLoadingItemProvider
             ITreeItemContentProvider,
             IItemLabelProvider,
             IItemPropertySource {
-
-    /**
-     * Placeholder that will be placed in viewers while layers are being loaded.
-     * 
-     * @author Jesse
-     * @since 1.1.0
-     */
-    public static class LayerLoadingPlaceHolder extends LayerDecorator
-            implements
-                LoadingPlaceHolder {
-
-        public LayerLoadingPlaceHolder( Layer layer ) {
-            super(layer);
-        }
-
-        public Image getImage() {
-            return getIcon().createImage();
-        }
-
-        public String getText() {
-            return getName();
-        }
-
-        public int getZorder() {
-            return Integer.MAX_VALUE;
-        }
-    }
 
     /**
      * Allows the property descriptor of the viewport model to appear as part of the map (User does
@@ -447,28 +417,16 @@ public class LazyMapLayerProvider extends AbstractLazyLoadingItemProvider
         return getResourceLocator().getImage("full/obj16/Map"); //$NON-NLS-1$
     }
 
-    public static final LayerLoadingPlaceHolder LOADING_LAYER;
-    static {
-        LOADING_LAYER = new LayerLoadingPlaceHolder(ProjectFactory.eINSTANCE.createLayer());
-        LOADING_LAYER.setName(Messages.ProjectItemProvider_loading);
-        Bundle bundle = ProjectEditPlugin.getPlugin().getBundle();
-
-        IPath path = new Path("icons/full/obj16/Layer.gif"); //$NON-NLS-1$
-        ImageDescriptor image = ImageDescriptor.createFromURL(FileLocator.find(bundle, path, null));
-        LOADING_LAYER.setIcon(image);
-        LOADING_LAYER.setVisible(true);
-    }
-
     @SuppressWarnings("unchecked")
     protected net.refractions.udig.project.internal.provider.LoadingPlaceHolder getLoadingItem() {
-        return LOADING_LAYER;
+        return LayerLoadingPlaceHolder.LOADING_LAYER;
     };
 
     protected ChildFetcher createChildFetcher() {
         return new ChildFetcher(this){
             protected void notifyChanged() {
                 LazyMapLayerProvider.this.notifyChanged(new ENotificationImpl((InternalEObject) parent,
-                        Notification.SET, ProjectPackage.MAP__CONTEXT_MODEL, LOADING_LAYER, null));
+                        Notification.SET, ProjectPackage.MAP__CONTEXT_MODEL, LayerLoadingPlaceHolder.LOADING_LAYER, null));
             }
             @SuppressWarnings("unchecked")
             @Override
