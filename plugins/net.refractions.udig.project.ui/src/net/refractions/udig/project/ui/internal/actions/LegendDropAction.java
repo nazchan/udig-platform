@@ -18,9 +18,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.refractions.udig.project.ILayerLegendItem;
 import net.refractions.udig.project.internal.Folder;
 import net.refractions.udig.project.internal.Layer;
+import net.refractions.udig.project.internal.LayerLegendItem;
+import net.refractions.udig.project.internal.LegendItem;
 import net.refractions.udig.project.internal.Map;
+import net.refractions.udig.project.internal.impl.LayerLegendItemImpl;
+import net.refractions.udig.project.internal.impl.ProjectFactoryImpl;
 import net.refractions.udig.project.ui.ApplicationGIS;
 import net.refractions.udig.project.ui.internal.LegendView;
 import net.refractions.udig.ui.IDropAction;
@@ -138,15 +143,37 @@ public class LegendDropAction extends IDropAction {
     public void perform( IProgressMonitor monitor ) {
         
         for( Object source : sourceList ) {
-            
             final ViewerDropLocation location = getViewerLocation();
-
-            if (location == ViewerDropLocation.NONE) {
-                //Do nothing
-            } else if (location == ViewerDropLocation.ON) {
-                moveIn(source);
-            } else {
-                move(source, location);
+            
+            if( source instanceof LegendItem ){
+                if (location == ViewerDropLocation.NONE) {
+                    //Do nothing
+                } else if (location == ViewerDropLocation.ON) {
+                    moveIn(source);
+                } else {
+                    // note that "moving" will remove it from the other list it was contained in
+                    move(source, location);
+                }
+            }
+            else if( source instanceof Layer ){
+                Layer layer = (Layer) source;
+                
+                // create a LayerLegendITem to hold this
+                LayerLegendItem item = ProjectFactoryImpl.eINSTANCE.createLayerLegendItem();
+                item.setLayer( layer );
+                
+                item.setName( layer.getName() );
+                item.setIcon( layer.getIcon());
+                
+                Object parent = getParent( getDestination() );
+                if( parent instanceof Map){
+                    Map map = (Map) parent;
+                    map.getLegend().add(item);
+                }
+                else if ( parent instanceof Folder){
+                    Folder folder = (Folder) parent;
+                    folder.getItems().add(0, item );
+                }
             }
             
         }
@@ -215,7 +242,10 @@ public class LegendDropAction extends IDropAction {
      */
     private void moveIn( Object source ) {
         final Folder folder = (Folder) getDestination(); 
-        folder.getItems().add(0, ((Layer) source));
+        
+        if ( source instanceof LayerLegendItem ){
+            folder.getItems().add(0, ((LayerLegendItem) source));
+        }
         expandElement(folder);
     }
     
@@ -358,6 +388,10 @@ public class LegendDropAction extends IDropAction {
             this.isLayerTarget = false;
         } else {
             if (data instanceof Layer) {
+                this.isFolderTarget = false;
+                this.isLayerTarget = true;
+            }
+            else if (data instanceof LayerLegendItem) {
                 this.isFolderTarget = false;
                 this.isLayerTarget = true;
             } else if (data instanceof Folder) {
