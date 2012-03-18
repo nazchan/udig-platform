@@ -459,10 +459,16 @@
            enablesFor="+"
            name="Legend Drag and Drop">
         <destination
+              class="net.refractions.udig.project.ui.internal.LegendView">
+        </destination>
+        <destination
               class="net.refractions.udig.project.ILegendItem">
         </destination>
         <acceptedType
               class="net.refractions.udig.project.ILegendItem">
+        </acceptedType>
+        <acceptedType
+              class="net.refractions.udig.project.ILayer">
         </acceptedType>
      </action>
      <action

@@ -38,7 +38,8 @@ import net.refractions.udig.project.internal.ProjectFactory;
 import net.refractions.udig.project.internal.ProjectPackage;
 import net.refractions.udig.project.internal.ProjectPlugin;
 import net.refractions.udig.project.internal.commands.AddFolderItemCommand;
-import net.refractions.udig.project.render.IViewportModel;
+import net.refractions.udig.project.internal.provider.MapItemLazyLegendProvider;
+import net.refractions.udig.project.internal.provider.ProjectItemProviderAdapterFactory;
 import net.refractions.udig.project.render.IViewportModelListener;
 import net.refractions.udig.project.render.ViewportModelEvent;
 import net.refractions.udig.project.ui.AdapterFactoryLabelProviderDecorator;
@@ -57,6 +58,7 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
@@ -127,7 +129,7 @@ public class LegendView extends ViewPart implements IDropTargetProvider, ISelect
     private RenameFolderAction renameFolderAction;
     
     private CheckboxTreeViewer viewer;
-    private LegendViewContentProvider contentProvider;
+    private AdapterFactoryContentProvider contentProvider;
     private AdapterFactoryLabelProviderDecorator labelProvider;
     private ILabelProviderListener labelProviderListener = new LabelProviderListerner();
     private CheckStateListener checkStateListener = new CheckStateListener();
@@ -235,7 +237,12 @@ public class LegendView extends ViewPart implements IDropTargetProvider, ISelect
         viewer = new CheckboxTreeViewer(parent, SWT.MULTI);
         
         //Set content provider settings
-        contentProvider = new LegendViewContentProvider(this);
+        ProjectItemProviderAdapterFactory factory = new ProjectItemProviderAdapterFactory(){
+            public Adapter createMapAdapter() {
+                return new MapItemLazyLegendProvider( this );
+            };
+        };
+        contentProvider = new AdapterFactoryContentProvider( factory );
         viewer.setContentProvider(contentProvider);
 
         //Set label provider settings
