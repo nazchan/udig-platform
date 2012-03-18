@@ -36,6 +36,9 @@ import net.refractions.udig.project.internal.Layer;
 import net.refractions.udig.project.internal.Map;
 import net.refractions.udig.project.internal.ProjectPackage;
 import net.refractions.udig.project.internal.ProjectPlugin;
+import net.refractions.udig.project.internal.impl.MapImpl;
+import net.refractions.udig.project.internal.provider.MapItemLazyLayerProvider;
+import net.refractions.udig.project.internal.provider.ProjectItemProviderAdapterFactory;
 import net.refractions.udig.project.render.IViewportModel;
 import net.refractions.udig.project.render.IViewportModelListener;
 import net.refractions.udig.project.render.ViewportModelEvent;
@@ -50,8 +53,10 @@ import net.refractions.udig.ui.ZoomingDialog;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.emf.common.notify.Adapter;
+import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
+import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
@@ -608,8 +613,9 @@ public class LayersView extends ViewPart
         getSite().getWorkbenchWindow().getPartService().addPartListener(partServiceListener);
 
         viewer = new CheckboxTreeViewer(parent, SWT.MULTI);
+        
         contentProvider = new AdapterFactoryContentProvider(ProjectUIPlugin.getDefault()
-                .getAdapterFactory()){
+                .getLayersViewAdapterFactory()){
             @Override
             public void notifyChanged( Notification notification ) {
                 super.notifyChanged(notification);

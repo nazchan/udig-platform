@@ -41,14 +41,18 @@ import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 
 /**
- * TODO Purpose of 
+ * This item provider supports lazy loading for fetching of its children, thus extends
+ * AbstractLazyLoadingItemProvider, and delegates non children-related functions to the
+ * auto-generated MapItemProvider. This is originally customised for the LayersView which receives a
+ * Map input and displays the list of layers on the view.
  * <p>
  * <ul>
  * <li></li>
  * </ul>
  * </p>
- * @author nchan
- * @since 1.2.0
+ * 
+ * @author Naz Chan (LISAsoft)
+ * @since 1.3.1
  */
 public class MapItemLazyLayerProvider extends AbstractLazyLoadingItemProvider
         implements

@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.List;
 
 import net.refractions.udig.core.AbstractUdigUIPlugin;
+import net.refractions.udig.project.internal.provider.MapItemLazyLayerProvider;
+import net.refractions.udig.project.internal.provider.ProjectItemProviderAdapterFactory;
 import net.refractions.udig.project.ui.feature.FeaturePanelProcessor;
 
 import org.eclipse.core.runtime.CoreException;
@@ -25,6 +27,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.emf.edit.provider.ReflectiveItemProviderAdapterFactory;
@@ -73,6 +76,7 @@ public class ProjectUIPlugin extends AbstractUdigUIPlugin {
 	private static ProjectUIPlugin INSTANCE;
 
     List<AdapterFactory> adapterFactories;
+    List<AdapterFactory> layersViewAdapterFactories;
 
     private static final String ADAPTER_FACTORIES_ID = "net.refractions.udig.project.ui.itemProviderAdapterFactories"; //$NON-NLS-1$
 
@@ -181,6 +185,7 @@ public class ProjectUIPlugin extends AbstractUdigUIPlugin {
     }
 
     private AdapterFactory adapterFactory;
+    private AdapterFactory layersViewAdapterFactory;
 
     /**
      * Returns the adapterfactory instance.
@@ -203,6 +208,72 @@ public class ProjectUIPlugin extends AbstractUdigUIPlugin {
         return adapterFactory;
     }
 
+    /**
+     * Returns the custom adapter factory instance for the LayersView. This is a special case to have
+     * the LayersView a lazy loading item provider for the fetching of layers in its display.
+     * 
+     * @return layersViewAdapterFactory
+     */
+    public AdapterFactory getLayersViewAdapterFactory() {
+        if (layersViewAdapterFactory == null) {
+            synchronized (mutex) {
+                List<AdapterFactory> factories = new ArrayList<AdapterFactory>();
+
+                factories.addAll(ProjectUIPlugin.getDefault().getLayersViewAdapterFactories());
+
+                // This one should be added last
+                factories.add(new ReflectiveItemProviderAdapterFactory());
+
+                layersViewAdapterFactory = new ComposedAdapterFactory(factories);
+            }
+        }
+        return layersViewAdapterFactory;
+    }
+    
+    /**
+     * Returns the list of adapter factories with the ProjectItemProviderAdapterFactory customised
+     * to return MapItemLazyLayerProvider when a map adapter is requested.
+     * 
+     * @return layersViewAdapterFactories
+     */
+    public List<AdapterFactory> getLayersViewAdapterFactories() {
+        if (layersViewAdapterFactories == null) {
+            layersViewAdapterFactories = new ArrayList<AdapterFactory>();
+
+            IExtensionRegistry registry = Platform.getExtensionRegistry();
+            IExtensionPoint extensionPoint = registry.getExtensionPoint(ADAPTER_FACTORIES_ID);
+            IExtension[] extensions = extensionPoint.getExtensions();
+
+            for( int i = 0; i < extensions.length; i++ ) {
+                IConfigurationElement[] elements = extensions[i].getConfigurationElements();
+
+                for( int j = 0; j < elements.length; j++ ) {
+                    try {
+                        Object adapterFactory = elements[j].createExecutableExtension("class"); //$NON-NLS-1$
+                        if (adapterFactory instanceof AdapterFactory) {
+                            
+                            if (adapterFactory instanceof ProjectItemProviderAdapterFactory) {
+                                final ProjectItemProviderAdapterFactory projItemAdapterFactory = new ProjectItemProviderAdapterFactory(){
+                                    public Adapter createMapAdapter() {
+                                        return new MapItemLazyLayerProvider(this);
+                                    };
+                                };
+                                layersViewAdapterFactories.add(projItemAdapterFactory);
+                            } else {
+                                layersViewAdapterFactories.add((AdapterFactory) adapterFactory);    
+                            }
+                            
+                        }
+                    } catch (CoreException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }
+        return Collections.unmodifiableList(layersViewAdapterFactories);
+    }
+    
     /**
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
      */
