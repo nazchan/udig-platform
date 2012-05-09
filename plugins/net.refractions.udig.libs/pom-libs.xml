@@ -739,7 +739,7 @@
 		<dependency>
 			<groupId>org.jgrasstools</groupId>
 			<artifactId>jgt-oms3</artifactId>
-			<version>0.7.4</version>
+			<version>0.7.5</version>
 		</dependency>
 		<dependency>
 			<groupId>javassist</groupId>
@@ -837,7 +837,35 @@
                      </execution>
 				</executions>
 			</plugin>
-			
+		     <plugin>
+		        <artifactId>maven-antrun-plugin</artifactId>
+		        <dependencies>
+		          <dependency>
+		            <groupId>ant</groupId>
+		            <artifactId>ant</artifactId>
+		            <version>1.6.5</version>
+		          </dependency>
+		          <dependency>
+		            <groupId>ant-contrib</groupId>
+		            <artifactId>ant-contrib</artifactId>
+		            <version>1.0b3</version>
+		          </dependency>
+		        </dependencies>
+		        <executions>
+			          <execution>
+			            <id>checktools</id>
+			            <phase>compile</phase>
+			            <configuration>
+			              <tasks>
+			                <ant antfile="tools_jar.xml" dir="${basedir}" target="tools"/>
+			              </tasks>
+			            </configuration>
+			            <goals>
+			              <goal>run</goal>
+			            </goals>
+			          </execution>
+		        </executions>
+		      </plugin>
          </plugins>
     </build>
     

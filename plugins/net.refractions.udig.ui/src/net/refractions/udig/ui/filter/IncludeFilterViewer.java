@@ -1,17 +1,12 @@
 package net.refractions.udig.ui.filter;
 
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.geotools.filter.text.ecql.ECQL;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 /**
@@ -23,48 +18,34 @@ import org.opengis.filter.Filter;
  */
 public class IncludeFilterViewer extends IFilterViewer {
     /**
-     * Factory used for the general purpose CQLFilterViewer.
+     * Factory used for the general purpose IncludeFilterViewer.
      * 
-     * @author jody
-     * @since 1.2.0
+     * @author Jody Garnett
+     * @since 1.3.2
      */
     public static class Factory extends FilterViewerFactory {
         /**
          * Only {@link FilterViewerFactory#APPROPRIATE} for INCLUDE and EXCLUDE.
          */
         @Override
-        public int appropriate(SimpleFeatureType schema, Filter filter) {
+        public int appropriate(FilterInput input, Filter filter) {
             // we are general purpose and will ignore schema
             if (filter == Filter.EXCLUDE || filter == Filter.INCLUDE) {
                 return APPROPRIATE;
             }
             return INCOMPLETE; // only able to display INCLUDE and EXCLDUE
         }
-
         @Override
         public IFilterViewer createViewer(Composite parent, int style) {
             return new IncludeFilterViewer(parent, style);
         }
     }
 
-    /**
-     * This is the expression we are working on here.
-     * <p>
-     * We are never going to be "null"; Expression.EXCLUDE is used to indicate an intentionally
-     * empty expression.
-     */
-    protected Filter filter = Filter.EXCLUDE;
-
     protected Composite control;
 
     protected Button enableButton;
 
     protected Button disableButton;
-
-    /**
-     * Indicates this is a required field
-     */
-    private boolean isRequired;
 
     public IncludeFilterViewer(Composite parent) {
         this(parent, SWT.SINGLE);
@@ -77,8 +58,6 @@ public class IncludeFilterViewer extends IFilterViewer {
      * @param none
      */
     public IncludeFilterViewer(Composite parent, int style) {
-        super(parent, style);
-        
         control = new Composite(parent, style);
         
         enableButton = new Button(control, SWT.RADIO);
@@ -86,6 +65,7 @@ public class IncludeFilterViewer extends IFilterViewer {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 internalUpdate(Filter.INCLUDE);
+                feedback();
             }
         });
 
@@ -97,6 +77,7 @@ public class IncludeFilterViewer extends IFilterViewer {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 internalUpdate( Filter.EXCLUDE);
+                feedback();
             }
         });
         disableButton.setBounds(20, 53, 90, 16);
@@ -145,7 +126,7 @@ public class IncludeFilterViewer extends IFilterViewer {
             enableButton.setSelection(false);
             disableButton.setSelection(false);
             
-            feedback("Dynamic filter not shown");
+            feedbackReplace( filter );
         }
     }
 

@@ -53,7 +53,7 @@ import org.opengis.util.ProgressListener;
  * <p>
  * @author Jody Garnett
  */
-public class ReshapeOperation implements IOp {
+public class TransformOperation implements IOp {
 
     
     public void op(final Display display, Object target, final IProgressMonitor monitor)
@@ -75,7 +75,7 @@ public class ReshapeOperation implements IOp {
         final SimpleFeature sample = feature;
         PlatformGIS.asyncInDisplayThread( new Runnable(){
             public void run() {
-                final ReshapeDialog dialog = new ReshapeDialog( display.getActiveShell(), sample );
+                final TransformDialog dialog = new TransformDialog( display.getActiveShell(), sample );
                 int result = dialog.open();
                 if( result == Window.CANCEL ){
                     return;
@@ -109,7 +109,7 @@ public class ReshapeOperation implements IOp {
     }
     /** Called to do the actual processing once we have everything set up 
      * @return */
-    public IGeoResource process(SimpleFeatureSource source, ReshapeDialog dialog, IProgressMonitor monitor ) throws IOException {
+    public IGeoResource process(SimpleFeatureSource source, TransformDialog dialog, IProgressMonitor monitor ) throws IOException {
         if( monitor == null ) monitor = new NullProgressMonitor();
         
         monitor.beginTask(Messages.ReshapeOperation_task, 100 );

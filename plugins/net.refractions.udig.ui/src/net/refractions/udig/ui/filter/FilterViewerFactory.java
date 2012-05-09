@@ -4,7 +4,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 /**
@@ -32,7 +31,7 @@ public abstract class FilterViewerFactory {
      * 
      * @see FilterViewerFactory#appropriate
      */
-    public final int NOT_APPROPRIATE = 0;
+    public final static int NOT_APPROPRIATE = 0;
 
     /**
      * Unable to display or edit all the provided information.
@@ -44,7 +43,7 @@ public abstract class FilterViewerFactory {
      * 
      * @see FilterViewerFactory#appropriate
      */
-    public final int INCOMPLETE = 10;
+    public final static int INCOMPLETE = 1;
 
     /**
      * General purpose Viewer tjat allows the user to view and edit the provided filter (although
@@ -54,7 +53,7 @@ public abstract class FilterViewerFactory {
      * 
      * @see FilterViewerFactory#appropriate
      */
-    public final int COMPLETE = 30;
+    public final static int COMPLETE = 25;
 
     /**
      * Custom viewer able to work with the provided filter.
@@ -66,7 +65,7 @@ public abstract class FilterViewerFactory {
      * 
      * @see FilterViewerFactory#appropriate
      */
-    public final int APPROPRIATE = 50;
+    public static final int APPROPRIATE = 50;
 
     /**
      * Moving beyond general purpose we have a viewer that is able to supply some sensible defaults
@@ -84,7 +83,7 @@ public abstract class FilterViewerFactory {
      * 
      * @see FilterViewerFactory#appropriate
      */
-    public final int FRIENDLY = 70;
+    public final static int FRIENDLY = 75;
 
     /**
      * An exact match - used for custom viewers that make some of the more complicated functions
@@ -95,8 +94,23 @@ public abstract class FilterViewerFactory {
      * 
      * @see FilterViewerFactory#appropriate
      */
-    public final int PERFECT = 100;
+    public final static int PERFECT = 100;
 
+    public static int toCategory(int appropriate) {
+        if (appropriate <= NOT_APPROPRIATE) {
+            return NOT_APPROPRIATE;
+        } else if (appropriate < COMPLETE) {
+            return INCOMPLETE;
+        } else if (appropriate < APPROPRIATE) {
+            return COMPLETE;
+        } else if (appropriate < FRIENDLY) {
+            return APPROPRIATE;
+        } else if (appropriate < PERFECT) {
+            return FRIENDLY;
+        } else {
+            return PERFECT;
+        }
+    }
     private IConfigurationElement config;
 
     /**
@@ -108,6 +122,21 @@ public abstract class FilterViewerFactory {
         this.config = config;
     }
 
+    /**
+     * Id provided as part of {@link #config} used to refer to this
+     * factory.
+     * <p>
+     * At the current time this is used to uniquely identify popup menu items (used to choose
+     * a filterViewer) and used by {@link FilterViewer#getViewerId()} allowing
+     * client code to reference the current viewer when saving our DialogSettings.
+     * 
+     * @return id used to identify this viewer
+     */
+    public String getId(){
+        String id = config.getAttribute("id");
+        return id;
+    }
+    
     public String getDisplayName() {
         String name = config.getAttribute("name");
         return name;
@@ -137,8 +166,8 @@ public abstract class FilterViewerFactory {
      *        capable of working with any content)
      * @param filter Existing filter provided by user, may be null
      */
-    public int appropriate(SimpleFeatureType schema, Filter filter) {
-        return INCOMPLETE; // default to listing the viewer but not recomending it
+    public int appropriate(FilterInput input, Filter filter) {
+        return INCOMPLETE; // default to listing the viewer but not recommending it
     }
 
     /**
@@ -160,4 +189,14 @@ public abstract class FilterViewerFactory {
      * @return requested viewer
      */
     public abstract IFilterViewer createViewer(Composite composite, int style);
+    
+    //
+    // Factory and Extension Point Support
+    //
+    /** General purpose {@link IFilterViewer} suitable for use as a default */
+    public static final String CQL_FILTER_VIEWER = "net.refractions.udig.ui.filter.cqlFilterViewer";
+
+    /** Extension point ID each "expressionViewer" will be processed into our {@link #factoryList()} */
+    public static final String FILTER_VIEWER_EXTENSION = "net.refractions.udig.ui.filterViewer";
+
 }

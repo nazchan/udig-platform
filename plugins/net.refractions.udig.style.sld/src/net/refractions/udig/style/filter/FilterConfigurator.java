@@ -4,9 +4,8 @@ import net.miginfocom.swt.MigLayout;
 import net.refractions.udig.project.ProjectBlackboardConstants;
 import net.refractions.udig.project.internal.Layer;
 import net.refractions.udig.style.IStyleConfigurator;
-import net.refractions.udig.ui.filter.CQLFilterViewer;
-import net.refractions.udig.ui.filter.DefaultFilterViewer;
 import net.refractions.udig.ui.filter.FilterInput;
+import net.refractions.udig.ui.filter.FilterViewer;
 import net.refractions.udig.ui.filter.IFilterViewer;
 
 import org.eclipse.jface.fieldassist.ControlDecoration;
@@ -17,7 +16,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
-import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.ecql.ECQL;
 import org.geotools.util.Utilities;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -83,10 +81,10 @@ public class FilterConfigurator extends IStyleConfigurator {
 
         Label label = new Label(parent, SWT.SINGLE );
         label.setText("Filter");
-        label.setLayoutData("cell 0 0,aligny top");
+        label.setLayoutData("cell 0 0,aligny top, gapx 0 unrelated"); // unrelated spacing after to leave room for label decoration
         
         ControlDecoration decoration = new ControlDecoration(label, SWT.RIGHT | SWT.TOP );
-        filterViewer = new DefaultFilterViewer(parent, SWT.MULTI );
+        filterViewer = new FilterViewer(parent, SWT.MULTI );
         filterViewer.getControl().setLayoutData("cell 1 0,grow,width 200:100%:100%,height 60:100%:100%");
         
         FilterInput input = new FilterInput();
@@ -121,7 +119,8 @@ public class FilterConfigurator extends IStyleConfigurator {
             return;
         }
         SimpleFeatureType type = getLayer().getSchema();
-        filterViewer.getInput().setSchema( type );
+        FilterInput filterInput = filterViewer.getInput();
+        filterInput.setSchema( type );
         
         final Filter style = getStyleFilter();
 

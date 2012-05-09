@@ -1,26 +1,27 @@
 package net.refractions.udig.ui.filter;
 
-import java.util.ArrayList;
-import java.util.List;
+import net.miginfocom.swt.MigLayout;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.text.ecql.ECQL;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
@@ -33,8 +34,8 @@ import org.opengis.filter.expression.PropertyName;
  * This implementation has a spinner which is enabled when a range (0 to 100%) is provided; an
  * Attribute combo which is enabled when a schema is provided.
  * 
- * @author Scott
- * @since 1.3.0
+ * @author Jody Garnett
+ * @since 1.3.2
  */
 public class SpinnerExpressionViewer extends IExpressionViewer {
     /**
@@ -43,34 +44,45 @@ public class SpinnerExpressionViewer extends IExpressionViewer {
     public static final String NONE = "- none -";
 
     /**
-     * Factory used for the general purpose DefaultExpressionViewer.
+     * Factory SpinnerExpressionViewer is restricted to working with literal numbers and numeric PropertyName expressions.
      * 
-     * @author jody
-     * @since 1.2.0
+     * @author Jody Garnett
+     * @since 1.3.2
      */
     public static class Factory extends ExpressionViewerFactory {
         @Override
-        public int appropriate(SimpleFeatureType schema, Expression expression) {
+        public int score(ExpressionInput input, Expression expression) {
+            if( input != null ){
+                Class<?> binding = input.getBinding();
+                
+                if( !binding.isAssignableFrom(Double.class)){
+                    return Appropriate.NOT_APPROPRIATE.getScore();
+                }
+            }
             if (expression instanceof Literal) {
                 Literal literal = (Literal) expression;
                 Double number = literal.evaluate(null, Double.class);
+                
                 if (number != null) {
                     if (number >= 0 && number <= 1.0) {
-                        return APPROPRIATE;
+                        return Appropriate.APPROPRIATE.getScore();
                     }
                 }
             }
             if (expression instanceof PropertyName) {
                 PropertyName name = (PropertyName) expression;
-                AttributeDescriptor descriptor = schema.getDescriptor(name.getPropertyName());
-                if (descriptor != null) {
-                    Class<?> binding = descriptor.getType().getBinding();
-                    if (Number.class.isAssignableFrom(binding)) {
-                        return APPROPRIATE;
+                if( input != null && input.getSchema() != null ){
+                    SimpleFeatureType schema = input.getSchema();
+                    AttributeDescriptor descriptor = schema.getDescriptor(name.getPropertyName());
+                    if (descriptor != null) {
+                        Class<?> binding = descriptor.getType().getBinding();
+                        if (Number.class.isAssignableFrom(binding)) {
+                            return Appropriate.APPROPRIATE.getScore();
+                        }
                     }
                 }
             }
-            return INCOMPLETE;
+            return Appropriate.INCOMPLETE.getScore();
         }
 
         @Override
@@ -78,14 +90,6 @@ public class SpinnerExpressionViewer extends IExpressionViewer {
             return new SpinnerExpressionViewer(parent, style);
         }
     }
-
-    /**
-     * This is the expression we are working on here.
-     * <p>
-     * We are never going to be "null"; Expression.NIL is used to indicate an intentionally empty
-     * expression.
-     */
-    protected Expression expr = Expression.NIL;
 
     Composite control;
 
@@ -95,29 +99,42 @@ public class SpinnerExpressionViewer extends IExpressionViewer {
 
     protected Text text;
 
-    boolean isRequired;
-
-    private SimpleFeatureType type;
-
     private SelectionListener listener = new SelectionListener() {
-
         @Override
         public void widgetSelected(SelectionEvent e) {
-            validate();
+            Expression newExpression = validate();
+            internalUpdate(newExpression);
         }
-
         @Override
         public void widgetDefaultSelected(SelectionEvent e) {
-
         }
     };
 
-    private Class<?> binding;
+    private ISelectionChangedListener comboListener = new ISelectionChangedListener() {
+        public void selectionChanged(SelectionChangedEvent event) {
+            Expression newExpression = validate();
+            internalUpdate(newExpression);
+        }
+    };
 
     public SpinnerExpressionViewer(Composite parent, int style) {
-        super(parent);
-
-        control = new Composite(parent, style);
+        boolean multiLine = (SWT.MULTI & style) != 0;
+        boolean readOnly = (SWT.READ_ONLY & style) != 0;
+        
+        control = new Composite(parent, SWT.NO_SCROLL){
+          @Override
+            public void setEnabled(boolean enabled) {
+                super.setEnabled(enabled);
+                combo.getControl().setEnabled(enabled);
+                spinner.setEnabled(enabled);
+                text.setEnabled(enabled);
+            }
+        };
+        Label comboLabel=null;
+        if( multiLine){
+            comboLabel = new Label(control, SWT.NONE);
+            comboLabel.setText("Numeric:");
+        } 
         combo = new ComboViewer(control, SWT.DEFAULT);
         combo.setContentProvider(ArrayContentProvider.getInstance());
         combo.setLabelProvider(new LabelProvider() {
@@ -131,82 +148,186 @@ public class SpinnerExpressionViewer extends IExpressionViewer {
             }
         });
         combo.getControl().setEnabled(false);
-
+        
+        Label spinnerLabel=null;
+        if( multiLine){
+            spinnerLabel = new Label(control, SWT.NONE);
+            spinnerLabel.setText("Value:");
+        } 
         spinner = new Spinner(control, SWT.DEFAULT);
         spinner.setMinimum(0);
         spinner.setMaximum(100);
         spinner.setIncrement(10);
         spinner.setEnabled(false);
+        
+        Label textLabel=null;
+        if( multiLine){
+            textLabel = new Label(control, SWT.NONE);
+            textLabel.setText("Text:");
+        }
+        text = new Text(control,SWT.SINGLE | SWT.READ_ONLY | SWT.BORDER | SWT.NO_SCROLL );
+        text.setEditable(false);
+        
+        if( multiLine ){
+            control.setLayout(new MigLayout("insets 0","[][][grow]","[]"));
+            
+            comboLabel.setLayoutData("cell 0 0, alignx trailing");
+            combo.getControl().setLayoutData("cell 1 0, width 200:30%:100%,gap related");
+            
+            spinnerLabel.setLayoutData("cell 0 1, alignx trailing");
+            spinner.setLayoutData("cell 1 1, width 200:30%:300%,gap related");
+            
+            textLabel.setLayoutData("cell 0 2, alignx trailing");
+            text.setLayoutData("cell 1 2, grow,width 200:pref:100%,gap related");
+        }
+        else {
+            control.setLayout(new MigLayout("insets 0","flowx",""));
+            combo.getControl().setLayoutData("width 200:30%:100%");
+            spinner.setLayoutData("width 200:30%:300%,gap unrelated");
+            text.setLayoutData("grow,width 200:pref:100%,gap unrelated");
+        }
+        listen(true);
+    }
+
+    private void listen(boolean listen) {
+        if( listen){
+            spinner.addSelectionListener(listener);
+            combo.addSelectionChangedListener(comboListener);
+        }
+        else {
+            spinner.removeSelectionListener(listener);
+            combo.removeSelectionChangedListener(comboListener);
+        }
+    }
+
+    protected Expression validate() {
+        if( combo.getControl().isEnabled() &&  !combo.getSelection().isEmpty() ){
+            Object selection = ((StructuredSelection)combo.getSelection()).getFirstElement();
+            if( selection != NONE ){
+                if ( selection instanceof String){
+                    String propertyName = (String) selection;
+                    FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
+                    
+                    return ff.property( propertyName );
+                }
+            }
+        }
+        if( spinner.isEnabled() ){
+            int number = spinner.getSelection();
+            FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
+            
+            return ff.literal( ((double)number)/100.0);
+        }
+        return null;
     }
 
     @Override
     public Control getControl() {
         return control;
     }
-
-    public boolean validate() {
-        return true;
-    }
-
-    @Override
-    public String getValidationMessage() {
-        return null;
-    }
-
-    @Override
-    public Expression getInput() {
-        return expr;
-    }
-
-    @Override
-    public ISelection getSelection() {
-        if (expr == null) {
-            return null;
-        }
-        IStructuredSelection selection = new StructuredSelection(expr);
-        return selection;
-    }
-
+    
+    /**
+     * Mostly used to update the combo with {@link FilterInput#getNumericPropertyList()} if available.
+     */
     @Override
     public void refresh() {
+        // combo update if we have numeric attributes
+        try {
+            listen(false);
+            if( input != null ){
+                combo.setInput( input.toNumericPropertyList() );
+                combo.getControl().setEnabled(true);
+            }
+            else {
+                combo.setInput(null);
+                combo.getControl().setEnabled(false);
+            }
+            // spinner if we have min and max
+            if( input != null ){
+                Object min = input.getMin();
+                Object max = input.getMax();
+                if( min instanceof Number && max instanceof Number){
+                    int minInt = ((Number)min).intValue();
+                    int maxInt = ((Number)max).intValue();
+                    
+                    spinner.setMinimum(minInt);
+                    spinner.setMaximum(maxInt);
+                    
+                    spinner.setEnabled( true );
+                }
+                else {
+                    spinner.setEnabled(false);
+                }
+            }
+            else {
+                spinner.setEnabled(false);
+            }
+            text.setEnabled(false);
+        }
+        finally {
+            listen(true);
+        }
+
+        refreshExpression();
+    }
+    
+    public void refreshExpression() {
+        Expression expr = getExpression();
         if (expr instanceof PropertyName) {
             PropertyName property = (PropertyName) expr;
             String name = property.getPropertyName();
-            refresh(null, name, null);
+            refreshControls(null, name, null);
+            feedback();
             return;
         } else if (expr instanceof Literal) {
             Literal literal = (Literal) expr;
             Double percent = literal.evaluate(null, Double.class);
             if (percent != null) {
-                refresh(percent, null, null);
+                refreshControls(percent, null, null);
+                feedback();
                 return;
             }
         }
         // We cannot display this expression - put up a warning
         String message = ECQL.toCQL(expr);
-        refresh(null, null, message);
+        refreshControls(null, null, message);
+        feedbackReplace( expr );
     }
 
-    protected void refresh(final Double percent, final String propertyName, final String message) {
+    protected void refreshControls(final Double number, final String propertyName, final String message) {
         if (control != null && !control.isDisposed()) {
             control.getDisplay().asyncExec(new Runnable() {
                 public void run() {
                     if (control == null || control.isDisposed()) {
                         return; // must of been disposed while in the display thread queue
                     }
-                    combo.setInput(toNumericAttributeList(schema));
+                    boolean isPercent = input != null && input.isPercent();
+                    
+                    combo.setInput(input.getNumericPropertyList());
 
-                    if (percent != null) {
+                    if (number != null) {
                         spinner.setEnabled(true);
-                        int number = (int) (percent * 100.0);
-                        spinner.setSelection(number);
+                        int value;
+                        if(isPercent){
+                            value = (int) (number * 100.0);
+                        }
+                        else {
+                            value = (int) Math.round( number );
+                        }
+                        spinner.setSelection(value);
                         if (message == null) {
-                            text.setText(number + "%");
+                            if( isPercent ){
+                                text.setText( value +"%");
+                            }
+                            else {
+                                text.setText( String.valueOf(value) );
+                            }
                         }
                     } else {
                         spinner.setEnabled(false);
-                        spinner.setSelection(100);
+                        spinner.setSelection(0);
                     }
+                    
                     if (propertyName != null) {
                         StructuredSelection selection = new StructuredSelection(propertyName);
                         combo.setSelection(selection, true);
@@ -223,92 +344,11 @@ public class SpinnerExpressionViewer extends IExpressionViewer {
     }
 
     @Override
-    public void setInput(Object input) {
-        if (input instanceof Expression) {
-            if (!input.equals(expr)) {
-                expr = (Expression) input;
-                refresh();
-            }
-        } else if (input instanceof String) {
-            String text = (String) input;
-            try {
-                Expression inputExpression = ECQL.toExpression(text);
-                if (inputExpression == null) {
-                    inputExpression = Expression.NIL;
-                }
-                if (!inputExpression.equals(expr)) {
-                    expr = (Expression) input;
-                    refresh();
-                }
-                refresh();
-            } catch (CQLException e) {
-                throw new IllegalStateException("ExpressionViewer requires Expression for input");
-            }
-        } else {
-            throw new IllegalStateException("ExpressionViewer requires Expression for input");
+    public void setExpression(Expression newExpression) {
+        if (!newExpression.equals(this.expression)) {
+            this.expression = newExpression;
+            refreshExpression();
         }
     }
 
-    @Override
-    public void setSelection(ISelection selection, boolean reveal) {
-        if (selection instanceof StructuredSelection) {
-            StructuredSelection structuredSelection = (StructuredSelection) selection;
-            Object value = structuredSelection.getFirstElement();
-
-            if (value instanceof Expression) {
-                setInput((Expression) value);
-            }
-        }
-    }
-
-    @Override
-    public void feedback() {
-
-    }
-
-    @Override
-    public void feedback(String warning) {
-
-    }
-
-    @Override
-    public void feedback(String exception, Exception eek) {
-
-    }
-
-    @Override
-    public void setSchema(SimpleFeatureType schema) {
-        this.type = schema;
-    }
-
-    private List<String> toNumericAttributeList(SimpleFeatureType schema) {
-        final List<String> options = new ArrayList<String>();
-        if (schema != null) {
-            for (AttributeDescriptor descriptor : schema.getAttributeDescriptors()) {
-                if (Number.class.isAssignableFrom(descriptor.getType().getBinding())) {
-                    options.add(descriptor.getLocalName());
-                }
-            }
-        }
-        options.add(NONE);
-        return options;
-    }
-
-    @Override
-    public SimpleFeatureType getSchema() {
-        return type;
-    }
-
-    @Override
-    public void setExpected(Class<?> binding) {
-        if (!Number.class.isAssignableFrom(binding)) {
-            feedback("Used to enter numbers");
-        }
-        this.binding = binding;
-    }
-
-    @Override
-    public Class<?> getExpected() {
-        return this.binding;
-    }
 }

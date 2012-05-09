@@ -20,9 +20,10 @@ import org.eclipse.swt.widgets.Text;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.filter.text.ecql.ECQL;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.Expression;
 
 /**
- * Simple {@link IFilterViewer} which uses a {@link Text} to edit a Filter using Constraint Query
+ * Simple {@link IExpressionViewer} which uses a {@link Text} to edit a Filter using Constraint Query
  * Language.
  * <p>
  * This represents a simple, full featured, filter viewer and can be extended as a starting point
@@ -39,7 +40,7 @@ import org.opengis.filter.Filter;
  * }
  * </pre>
  * <p>
- * Each time the text is successfully parsed the {@link #getFilter()} is is updated with the latest
+ * Each time the text is successfully parsed the {@link #getFilter()} is updated with the latest
  * value and a {@link SelectionEvent} sent out - usin the {@link #internalUpdate(Filter)} method.
  * <p>
  * Suggestions are provided as you type using {@link #proposalProvider}. The {@link #refresh()}
@@ -50,25 +51,25 @@ import org.opengis.filter.Filter;
  * @author Jody Garnett
  * @since 1.3.0
  */
-public class CQLFilterViewer extends IFilterViewer {
+public class CQLExpressionViewer extends IExpressionViewer {
     /**
-     * Factory used to create our basic CQLFilterViewer as a bare bones
-     * {@link FilterViewerFactory#COMPLETE} implementation capable of editing any filter.
+     * Factory used to create our basic CQLExpressionViewer as a bare bones
+     * {@link Appropriate#COMPLETE} implementation capable of editing any expression.
      * 
      * @author Jody Garnett
      * @since 1.3.2
      */
-    public static class Factory extends FilterViewerFactory {
-        @Override
+    public static class Factory extends ExpressionViewerFactory {
         /**
          * Consider CQLFilterViewer a fallback plan.
          */
-        public int appropriate(FilterInput input, Filter filter) {
-            return COMPLETE;
+        @Override
+        public int score(ExpressionInput input, Expression expression) {
+            return Appropriate.COMPLETE.getScore();
         }
 
-        public IFilterViewer createViewer(Composite parent, int style) {
-            return new CQLFilterViewer(parent, style);
+        public IExpressionViewer createViewer(Composite parent, int style) {
+            return new CQLExpressionViewer(parent, style);
         }
     }
 
@@ -115,18 +116,20 @@ public class CQLFilterViewer extends IFilterViewer {
      * @param parent
      * @param style
      */
-    public CQLFilterViewer(Composite parent, int style) {
+    public CQLExpressionViewer(Composite parent, int style) {
+        boolean isReadOnly = (style & SWT.READ_ONLY) != 0;
+
         if ((style & SWT.SINGLE) != 0) {
             int textStyle = SWT.SINGLE | SWT.BORDER;
-            text = new Text(parent, textStyle);
-            if( (style & SWT.READ_ONLY) != 0 ){
+            if( isReadOnly ){
                 textStyle |= SWT.READ_ONLY;
             }
-            // setPreferredTextSize(30,1 );
+            text = new Text(parent, textStyle);
+            setPreferredTextSize(30,1 );
         }
         else if ((style & SWT.MULTI) != 0) {
             int textStyle = SWT.MULTI|SWT.WRAP|SWT.BORDER|SWT.V_SCROLL;
-            if( (style & SWT.READ_ONLY) != 0 ){
+            if( isReadOnly ){
                 textStyle |= SWT.READ_ONLY;
             }
             text = new Text(parent, textStyle);
@@ -136,8 +139,10 @@ public class CQLFilterViewer extends IFilterViewer {
             text = new Text(parent, SWT.SINGLE | SWT.BORDER);
             setPreferredTextSize(30,1 );
         }
-
-        proposalProvider = new FunctionContentProposalProvider();
+        
+        text.setEditable( !isReadOnly );
+        
+        proposalProvider = new FunctionContentProposalProvider(false);
         TextContentAdapter contentAdapter = new TextContentAdapter();
         
         ContentProposalAdapter adapter = new ContentProposalAdapter(text, contentAdapter,
@@ -164,36 +169,30 @@ public class CQLFilterViewer extends IFilterViewer {
      * Called when a key is pressed to check if the filter has changed.
      */
     protected void changed() {
-        Filter parsedFilter = validate();
+        Expression parsedFilter = validate();
         if (parsedFilter != null) {
             internalUpdate(parsedFilter);
         }
     }
-    /** Workaround to support INCLUDE / EXCLUDE pending https://jira.codehaus.org/browse/GEOT-4110 */
-    protected Filter toFilter( String txt ) throws CQLException{
+    /** Workaround to support Expression.NIL as a repesenation of "" */
+    protected Expression toExpression( String txt ) throws CQLException{
         if( txt == null ){
             return null;
         }
-        else if( "INCLDUE".equals( txt.trim() )){
-            return Filter.INCLUDE;
+        else if( "".equals( txt.trim() )){
+            return Expression.NIL;
         }
-        else if( "EXCLUDE".equals( txt.trim() )){
-            return Filter.EXCLUDE;
-        }
-        return ECQL.toFilter(txt);
+        return ECQL.toExpression(txt);
     }
-    /** Workaround to support INCLUDE / EXCLUDE pending https://jira.codehaus.org/browse/GEOT-4110 */
-    protected String toCQL(Filter filter) {
-        if( filter == null ){
+    /** Workaround to support Expression.NIL and null */
+    protected String toCQL(Expression expression) {
+        if( expression == null ){
             return null;
         }
-        else if( filter == Filter.INCLUDE ){
-            return "INCLUDE";
+        else if( expression == Expression.NIL ){
+            return "";
         }
-        else if( filter == Filter.EXCLUDE ){
-            return "EXCLUDE";
-        }
-        return ECQL.toCQL(filter);
+        return ECQL.toCQL(expression);
     }
     
     /**
@@ -206,24 +205,24 @@ public class CQLFilterViewer extends IFilterViewer {
      * take care to use the feedback decoration in order to indicate to the user any problems
      * encountered.
      * 
-     * @return true if the field is valid
+     * @return validated Expression provided by user or null if they are still editing
      */
-    protected Filter validate() {
-        Filter parsedFilter;
+    protected Expression validate() {
+        Expression parsedExpr;
         try {
-            parsedFilter = toFilter(text.getText());
+            parsedExpr = toExpression(text.getText());
         } catch (CQLException e) {
             feedback(e.getLocalizedMessage(), e);
             return null;
         }
-        if (parsedFilter == null) {
+        if (parsedExpr == null || parsedExpr == Expression.NIL) {
             if (input != null && input.isRequired() ) {
                 feedback("Required", true);
                 return null;
             }
         }
         feedback();
-        return parsedFilter;
+        return parsedExpr;
     }
 
     @Override
@@ -232,33 +231,32 @@ public class CQLFilterViewer extends IFilterViewer {
             SortedSet<String> names = new TreeSet<String>(input.toPropertyList());
             proposalProvider.setExtra(names);
         }
-        refreshFilter();
+        refreshText();
     }
 
-    /** Used to supply a filter for display or editing */
     @Override
-    public void setFilter(Filter filter) {
-        if (this.filter == filter) {
+    public void setExpression(Expression expression) {
+        if (this.expression == expression) {
             return;
         }
-        this.filter = filter;
-        refreshFilter();
-        fireSelectionChanged(new SelectionChangedEvent(CQLFilterViewer.this, getSelection()));
+        this.expression = expression;
+        refreshText();
+        fireSelectionChanged(new SelectionChangedEvent(CQLExpressionViewer.this, getSelection()));
     }
 
-    /** Called to update the viewer text control to display the provided filter */
-    private void refreshFilter() {
+    /** Called to update the viewer text control to display the provided expression */
+    private void refreshText() {
         if (text != null && !text.isDisposed()) {
             text.getDisplay().asyncExec(new Runnable() {
                 public void run() {
                     if (text == null || text.isDisposed())
                         return;
 
-                    if (filter == null) {
+                    if (expression == null) {
                         text.setText("");
                         feedback("Empty");
                     } else {
-                        String cql = toCQL(filter);
+                        String cql = toCQL(expression);
                         text.setText(cql);
                         feedback();
                     }

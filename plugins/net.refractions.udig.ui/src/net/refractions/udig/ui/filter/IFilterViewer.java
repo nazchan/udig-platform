@@ -24,9 +24,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.geotools.filter.text.cql2.CQL;
+import org.geotools.filter.text.ecql.ECQL;
 import org.geotools.util.Utilities;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -35,7 +34,14 @@ import org.opengis.filter.Filter;
  * Used to create and edit Filters. Used to package up several controls following the {@link Viewer}
  * convention of a constructor to create the controls, an input providing context to help editing, and a
  * selection to set and retrieve the value being worked on.
- * 
+ * <p>
+ * Implementations are asked to respect the following style constants
+ * <ul>
+ * <li>{@link SWT#SINGLE}: Consider to be a single line</li>
+ * <li>{@link SWT#MULTI}: Viewer can take additional height</li>
+ * <li>{@link SWT#READ_ONLY}</li>
+ * </ul>
+ 
  * @see FilterInput Used to provide context (such as feature type to suggest attribute names)
  * @author Scott
  * @author Jody Garnett
@@ -52,25 +58,6 @@ public abstract class IFilterViewer extends Viewer {
      * Filter being edited.
      */
     protected Filter filter;
-    
-    /**
-     * Default constructor. Calls <code>IFilterViewer( Composite parent, SWT.SINGLE )</code>
-     */
-    public IFilterViewer(Composite parent) {
-        this(parent, SWT.SINGLE);
-    }
-
-    /**
-     * Constructor allowing minimal control of style.
-     * <p>
-     * The following are supported at this time:
-     * <ul>
-     * <li>{@link SWT#SINGLE}: Consider to be a single line</li>
-     * <li>{@link SWT#MULTI}: Viewer can take additional height</li>
-     * </ul>
-     */
-    public IFilterViewer(Composite parent, int style) {
-    }
 
     /**
      * Set the input for this Filter.
@@ -144,8 +131,8 @@ public abstract class IFilterViewer extends Viewer {
         if( this.filter == newFilter ){
             return;
         }
-        String before = filter != null ? CQL.toCQL(filter) : "(empty)";
-        String after = newFilter != null ? CQL.toCQL(newFilter) : "(empty)";
+        String before = filter != null ? ECQL.toCQL(filter) : "(empty)";
+        String after = newFilter != null ? ECQL.toCQL(newFilter) : "(empty)";
         if (!Utilities.equals(before, after)){
             this.filter = newFilter;
             StructuredSelection selection = newFilter != null ? new StructuredSelection( newFilter) : StructuredSelection.EMPTY;
@@ -185,7 +172,9 @@ public abstract class IFilterViewer extends Viewer {
             input.getFeedback().hide();
         }
     }
-
+    protected void feedbackReplace( Filter filter ){
+        feedback("Unable to display dynamic filter: \n" + ECQL.toCQL(filter)+ "\nEdit to replace filter.");
+    }
     /**
      * Provide warning feedback.
      * <p>
@@ -222,8 +211,13 @@ public abstract class IFilterViewer extends Viewer {
                 feedback.setDescriptionText(warning);
                 
                 FieldDecorationRegistry decorations = FieldDecorationRegistry.getDefault();
-                FieldDecoration requiredDecoration = decorations.getFieldDecoration(FieldDecorationRegistry.DEC_REQUIRED);
-                feedback.setImage(requiredDecoration.getImage());
+                if( isRequired ){
+                    FieldDecoration requiredDecoration = decorations.getFieldDecoration(FieldDecorationRegistry.DEC_REQUIRED);
+                    feedback.setImage(requiredDecoration.getImage());
+                } else {
+                    FieldDecoration warningDecoration = decorations.getFieldDecoration(FieldDecorationRegistry.DEC_WARNING );
+                    feedback.setImage(warningDecoration.getImage());
+                }
                 feedback.show();
             }
             Control control = getControl();
@@ -246,7 +240,9 @@ public abstract class IFilterViewer extends Viewer {
             ControlDecoration feedback = input.getFeedback();
             
             feedback.setDescriptionText(error);
-            // feedback.setImage(ERROR_IMAGE);
+            FieldDecorationRegistry decorations = FieldDecorationRegistry.getDefault();
+            FieldDecoration warningDecoration = decorations.getFieldDecoration(FieldDecorationRegistry.DEC_WARNING);
+            feedback.setImage(warningDecoration.getImage());
             feedback.show();
         }
         Control control = getControl();
