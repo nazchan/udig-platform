@@ -211,11 +211,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
-			<artifactId>gt-epsg-h2</artifactId>
-			<version>${geotools.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.geotools</groupId>
 			<artifactId>gt-geotiff</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
@@ -480,14 +475,14 @@
 			<version>1.1.3</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<!-- These GeoTools dependencies are required for compile only - we are using gt-epsg-h2 -->
+		<!-- We are using EPSG database converted into a local HSQL pure java database -->
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-epsg-hsql</artifactId>
 			<version>${geotools.version}</version>
-			<scope>provided</scope>
 		</dependency>
+
+		<!-- These GeoTools dependencies are required for compile only we are using gt-epsg-hsql-->
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-epsg-wkt</artifactId>
@@ -714,7 +709,15 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- omsbox dependencies -->
+		<!-- 
+             omsbox dependencies 
+             ===================
+
+             Note that these do not necessarily need to be 
+             added to the libs runtime environment.
+             The spatial toolbox needs them to be there as 
+             library but will pick them on its own.
+        -->
 
 		<!-- tools.jar provided by refresh.xml -->
 		<!-- <dependency>
@@ -736,7 +739,7 @@
 		<dependency>
 			<groupId>org.jgrasstools</groupId>
 			<artifactId>jgt-oms3</artifactId>
-			<version>0.7.3</version>
+			<version>0.7.4</version>
 		</dependency>
 		<dependency>
 			<groupId>javassist</groupId>
@@ -757,6 +760,16 @@
 			<groupId>org.fusesource.jansi</groupId>
 			<artifactId>jansi</artifactId>
 			<version>1.3</version>
+		</dependency>
+        <dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math</artifactId>
+			<version>2.2</version>
+		</dependency>
+        <dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-grid</artifactId>
+			<version>${geotools.version}</version>
 		</dependency>
 	</dependencies>
 

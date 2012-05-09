@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-3.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-runtime-3.3.jar"/>
@@ -8,6 +11,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-dbcp-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-io-2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-jxpath-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-math-2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-pool-1.5.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/eastwood-1.1.1-20090908.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-1.6.2.jar"/>
@@ -23,7 +27,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/gt-coverage-8-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-cql-8-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-data-8-SNAPSHOT.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/gt-epsg-h2-8-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-epsg-hsql-8-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-geotiff-8-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-graph-8-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-grassraster-8-SNAPSHOT.jar"/>
@@ -103,7 +107,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.13.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jfreechart-experimental-1.0.13.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jfreechart-swt-1.0.13.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jgt-oms3-0.7.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jgt-oms3-0.7.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jline-0.9.94.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jna-3.0.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/joda-time-1.6.jar"/>
@@ -140,8 +144,5 @@
 	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-client-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-common-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xpp3_min-1.1.4c.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
